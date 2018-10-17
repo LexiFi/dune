@@ -301,9 +301,9 @@ let modules_of_files ~dir ~files =
       (* we aren't using Filename.extension because we want to handle
          filenames such as foo.cppo.ml *)
       match String.lsplit2 fn ~on:'.' with
-      | Some (s, "ml" ) -> Left  (make_module OCaml  s fn)
+      | Some (s, ("ml" | "mf") ) -> Left  (make_module OCaml  s fn)
       | Some (s, "re" ) -> Left  (make_module Reason s fn)
-      | Some (s, "mli") -> Right (make_module OCaml  s fn)
+      | Some (s, ("mli" | "mfi")) -> Right (make_module OCaml  s fn)
       | Some (s, "rei") -> Right (make_module Reason s fn)
       | _ -> Skip)
   in
