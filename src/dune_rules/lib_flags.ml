@@ -110,7 +110,7 @@ module L = struct
     ; melange_emit : bool
     }
 
-  let include_paths_gen =
+  let include_paths_gen ~init ~add ~remove =
     let add_public_dir ~visible_cmi obj_dir acc mode add lib =
       match visible_cmi with
       | false -> acc
@@ -130,7 +130,7 @@ module L = struct
         in
         List.fold_left public_cmi_dirs ~init:acc ~f:(fun acc path -> add acc path lib)
     in
-    fun ?project ts mode acc add remove ->
+    fun ?project ts mode ->
       let visible_cmi =
         match project with
         | None -> fun _ -> true
@@ -146,7 +146,7 @@ module L = struct
              | _ -> true)
       in
       let dirs =
-        List.fold_left ts ~init:acc ~f:(fun acc t ->
+        List.fold_left ts ~init ~f:(fun acc t ->
           let obj_dir = Lib_info.obj_dir (Lib.info t) in
           let visible_cmi = visible_cmi t in
           match mode.lib_mode with
@@ -168,15 +168,13 @@ module L = struct
          ?project
          ts
          { lib_mode = mode; melange_emit = false }
-         Path.Map.empty
-         (fun acc p l -> Path.Map.set acc p (direct l))
-         Path.Map.remove)
+         ~init:Path.Map.empty
+         ~add:(fun acc p l -> Path.Map.set acc p (direct l))
+         ~remove:Path.Map.remove)
   ;;
 
   let include_paths ?project ts mode =
-    let add acc p _ = Path.Set.add acc p in
-    let remove = Path.Set.remove in
-    include_paths_gen ?project ts mode Path.Set.empty add remove
+    include_paths_gen ?project ts mode ~init:Path.Set.empty ~add:(fun acc p _ -> Path.Set.add acc p) ~remove:Path.Set.remove
   ;;
 
   let melange_emission_include_flags ?project ts =

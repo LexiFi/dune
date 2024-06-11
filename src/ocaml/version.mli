@@ -77,5 +77,5 @@ val has_META_files : t -> bool
 (** Whether the compiler supports occurrences indexation *)
 val supports_bin_annot_occurrences : t -> bool
 
-(**Whether the compiler supports -H flag for including libs*)
+(**Whether the compiler supports the -H flag *)
 val supports_hidden_includes : t -> bool
